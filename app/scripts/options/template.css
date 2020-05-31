@@ -1,0 +1,19 @@
+.element-block {
+    margin: 0.5rem 0;
+}
+
+.element-inline {
+    margin: 0 0.5rem;
+}
+
+.template-text {
+    font-family: monospace;
+}
+
+dt {
+    font-family: monospace;
+}
+
+dd {
+    opacity: 75%;
+}

@@ -1,0 +1,37 @@
+{
+  "name": "chrome-quote-copy-link",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/file-loader": "^4.2.0",
+    "@types/mustache": "^4.0.1",
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
+    "@types/uuid": "^8.0.0",
+    "css-loader": "^3.6.0",
+    "file-loader": "^6.0.0",
+    "style-loader": "^1.2.1",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.3",
+    "typesync": "^0.7.0",
+    "webextension-polyfill-ts": "^0.16.0",
+    "webextension-toolbox": "^3.0.0"
+  },
+  "dependencies": {
+    "escape-string-regexp": "^4.0.0",
+    "mustache": "^4.0.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.88.2",
+    "ta-json": "^2.5.0",
+    "uuid": "^8.2.0",
+    "webextension-polyfill": "^0.6.0"
+  },
+  "scripts": {
+    "preinstall": "typesync || :",
+    "start": "webextension-toolbox dev chrome",
+    "package": "webextension-toolbox build chrome"
+  }
+}

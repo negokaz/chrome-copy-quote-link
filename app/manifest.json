@@ -1,0 +1,23 @@
+{
+    "manifest_version": 2,
+    "name": "Quote Copy Link",
+    "description": "share page text and the link with any formats",
+    "version": "0.1.0",
+    "permissions": [
+      "storage",
+      "activeTab",
+      "contextMenus",
+      "clipboardWrite"
+    ],
+    "icons": {
+        "16": "icons/icon-16.png",
+        "48": "icons/icon-48.png",
+        "128": "icons/icon-128.png"
+    },
+    "background": {
+      "scripts": [
+        "scripts/background.js"
+      ]
+    },
+    "options_page": "options.html"
+  }

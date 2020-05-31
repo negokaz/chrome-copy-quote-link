@@ -1,0 +1,16 @@
+.controls {
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    z-index: 999;
+}
+
+.control {
+    margin-right: 1rem !important;
+}
+
+.option-form {
+    padding-top: 6rem;
+    margin: 0 auto;
+    width: 40rem;
+}
