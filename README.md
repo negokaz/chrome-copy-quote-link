@@ -1,4 +1,4 @@
-# ![](app/icons/icon-48.png) Quote Copy Link
+# ![](app/icons/icon-48.png) Copy Quote Link
 
 A Chrome extension to share page content and the link with any formats
 
@@ -11,4 +11,4 @@ A Chrome extension to share page content and the link with any formats
 
 Copyright (c) 2020 Kazuki Negoro
 
-Quote Copy Link is released under the [MIT License](LICENSE)
+Copy Quote Link is released under the [MIT License](LICENSE)
