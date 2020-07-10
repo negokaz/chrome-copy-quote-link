@@ -2,6 +2,8 @@
 
 A Chrome extension to share page content and the link with any formats
 
+[![](https://img.shields.io/chrome-web-store/v/ghekfhokmbflcadbpnpghlmkokcbipde.svg?style=flat-square)](https://chrome.google.com/webstore/detail/ghekfhokmbflcadbpnpghlmkokcbipde)
+
 ## Dev Scripts
 
 - `yarn start` - build dev-mode extension with auto-reloading
