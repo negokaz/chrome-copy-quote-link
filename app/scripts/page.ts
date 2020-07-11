@@ -103,7 +103,7 @@ class PageSelection {
             [prefix, textStart, textEnd, suffix].forEach(r => r.detach());
             console.groupEnd();
         }
-        return `#:~:text=${prefix.hasText() ? encodeURI(prefix.getText()) + '-,' : ''}${encodeURI(textStart.getText())}${textEnd.hasText() ? ',' + encodeURI(textEnd.getText()) : ''}${suffix.hasText() ? ',-' + encodeURI(suffix.getText()) : ''}`;
+        return `#:~:text=${prefix.hasText() ? this.encodeCharString(prefix.getText()) + '-,' : ''}${this.encodeCharString(textStart.getText())}${textEnd.hasText() ? ',' + this.encodeCharString(textEnd.getText()) : ''}${suffix.hasText() ? ',-' + this.encodeCharString(suffix.getText()) : ''}`;
     }
 
     private normalizeString(text: string): string {
@@ -112,6 +112,24 @@ class PageSelection {
 
     private escapeRegex(text: string): string {
         return escapeStringRegexp(text).replace(/[\r\n]/, '\\s+');
+    }
+
+    private encodeCharString(text: string): string {
+        // https://wicg.github.io/scroll-to-text-fragment/#fragment-directive-grammar
+        return encodeURI(text)
+                .replace('-', this.encodePercent('-'))
+                .replace('#', this.encodePercent('#'))
+                .replace('&', this.encodePercent('&'))
+                .replace(',', this.encodePercent(','));
+    }
+
+    private encodePercent(text: string): string {
+        let encoded = '';
+        const length = text.length;
+        for (let i = 0; i < length; i++) {
+            encoded = encoded + '%' + text.codePointAt(i).toString(16)
+        }
+        return encoded;
     }
 }
 
