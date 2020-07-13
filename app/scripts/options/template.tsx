@@ -1,4 +1,4 @@
-import React, { useState, useMemo, forwardRef, useImperativeHandle, useCallback } from 'react';
+import React, { useState, useMemo, forwardRef, useImperativeHandle, useCallback, useEffect, useRef } from 'react';
 
 import { Input, Form, Radio, Button, Icon, Card, Transition, Popup } from 'semantic-ui-react'
 
@@ -8,6 +8,8 @@ import './template.css';
 
 export interface TemplateProps {
     state: TemplateState
+
+    isNew?: boolean
 
     onRemove: (state: TemplateState) => void
 }
@@ -27,6 +29,14 @@ export const Template = forwardRef<TemplateRef, TemplateProps>((props, ref) => {
             return state;
         }
     }));
+
+    const nameInputRef = useRef<Input>(null);
+
+    useEffect(() => {
+        if (props.isNew) {
+            nameInputRef.current.focus();
+        }
+    }, []);
 
     const scopeInputName = useMemo(() => `scope-${props.state.id}`, []);
 
@@ -52,7 +62,7 @@ export const Template = forwardRef<TemplateRef, TemplateProps>((props, ref) => {
         <Card id={`template-${props.state.id}}`} fluid onMouseEnter={() => setShowRemove(true)} onMouseLeave={() => setShowRemove(false)}>
             <Card.Content>
                 <div className='element-block'>
-                    <Input size='small' placeholder='template name' value={state.name} onChange={handleNameChange} />
+                    <Input size='small' placeholder='template name' ref={nameInputRef} value={state.name} onChange={handleNameChange} />
                     <span className='element-inline'>context:</span>
                     <Radio
                         className='element-inline'

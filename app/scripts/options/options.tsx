@@ -39,7 +39,7 @@ export default function Options() {
         const newTemplateState = TemplateState.empty();
         const ref = React.createRef<TemplateRef>();
         templateRef.current.set(newTemplateState.id, ref);
-        updateTemplates(current => current.concat(<Template ref={ref} key={newTemplateState.id} state={newTemplateState} onRemove={removeTemplate} />));
+        updateTemplates(current => current.concat(<Template isNew ref={ref} key={newTemplateState.id} state={newTemplateState} onRemove={removeTemplate} />));
     }, []);
 
     const save = useCallback(async () => {
