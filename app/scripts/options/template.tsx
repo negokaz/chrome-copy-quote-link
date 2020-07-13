@@ -1,6 +1,6 @@
 import React, { useState, useMemo, forwardRef, useImperativeHandle, useCallback } from 'react';
 
-import { Input, TextArea, Radio, Button, Icon, Card, Transition, Popup } from 'semantic-ui-react'
+import { Input, Form, Radio, Button, Icon, Card, Transition, Popup } from 'semantic-ui-react'
 
 import { Template as TemplateState } from '../template';
 
@@ -20,6 +20,7 @@ export const Template = forwardRef<TemplateRef, TemplateProps>((props, ref) => {
 
     const [state, setState] = useState(props.state);
     const [showRemove, setShowRemove] = useState(false);
+    const [templateError, setTemplateError] = useState<string>(null);
 
     useImperativeHandle(ref, () => ({
         template() {
@@ -31,9 +32,21 @@ export const Template = forwardRef<TemplateRef, TemplateProps>((props, ref) => {
 
     const remove = useCallback(() => props.onRemove(state), []);
 
-    const handleScopeChange     = useCallback((e, { value }) => setState(current => current.withEnableContexts(value)), []);
-    const handleNameChange      = useCallback((e, { value }) => setState(current => current.withName(value)), []);
-    const handleTemplateChange  = useCallback((e, { value }) => setState(current => current.withTemplate(value)), []);
+    const handleScopeChange = useCallback((e, { value }) => setState(current => current.withEnableContexts(value)), []);
+    const handleNameChange  = useCallback((e, { value }) => setState(current => current.withName(value)), []);
+
+    const tryUpdateTemplate = (currentState: TemplateState, template: string) => {
+        const newState = currentState.withTemplate(template);
+        const result = newState.validate();
+        if (result instanceof Error) {
+            setTemplateError(result.message);
+        } else {
+            setTemplateError(null);
+        }
+        return newState;
+    };
+
+    const handleTemplateChange = useCallback((e, { value }) => setState(current => tryUpdateTemplate(current, value)),[]);
 
     return (
         <Card id={`template-${props.state.id}}`} fluid onMouseEnter={() => setShowRemove(true)} onMouseLeave={() => setShowRemove(false)}>
@@ -82,7 +95,16 @@ export const Template = forwardRef<TemplateRef, TemplateProps>((props, ref) => {
                             </dl>
                         }
                         wide={true}
-                        trigger={<TextArea className='element-block template-text' placeholder='template' style={{ minHeight: 110 }} value={state.template} onChange={handleTemplateChange} />}
+                        trigger={
+                            <Form.TextArea
+                                className='element-block template-text'
+                                placeholder='template'
+                                style={{ minHeight: 110 }}
+                                value={state.template}
+                                onChange={handleTemplateChange}
+                                error={templateError}
+                            />
+                        }
                     />
                 </div>
             </Card.Content>

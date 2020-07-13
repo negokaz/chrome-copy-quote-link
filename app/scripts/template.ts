@@ -36,7 +36,15 @@ export class Template {
         this.name = name;
         this.template = template;
         this.enableContexts = enableContexts;
-        Mustache.parse(this.template);
+    }
+
+    validate(): null | Error {
+        try {
+            Mustache.parse(this.template);
+        } catch (e) {
+            return e;
+        }
+        return null;
     }
 
     render(copied: Copied): string {
