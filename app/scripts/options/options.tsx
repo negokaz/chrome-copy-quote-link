@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, RefObject, useCallback } from 'reac
 import { Template, TemplateRef } from './template';
 import { Template as TemplateState } from '../template'
 import { browser } from "webextension-polyfill-ts";
-import { Icon, Form, Button, Card, Segment } from 'semantic-ui-react'
+import { Icon, Form, Button, Card, Segment, Transition } from 'semantic-ui-react'
 import { OptionSaved } from '../messages';
 import OptionTable from '../optionTable';
 
@@ -12,6 +12,7 @@ export default function Options() {
     const storage = browser.storage.local;
 
     const [templates, updateTemplates] = useState(new Array<JSX.Element>());
+    const [saved, setSaved] = useState(false);
 
     const templateRef = useRef(new Map<string, RefObject<TemplateRef>>());
 
@@ -49,6 +50,8 @@ export default function Options() {
                 .filter(t => t.name.trim() !== '' && t.enableContexts.length !== 0);
         await storage.set({'option': new OptionTable(templates)});
         await browser.runtime.sendMessage(browser.runtime.id, new OptionSaved());
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
     }, []);
 
     return (
@@ -60,7 +63,7 @@ export default function Options() {
                         Add template
                     </Button>
                     <Button className='control' icon size='small' onClick={save}>
-                        <Icon name='download' />
+                        <Icon name={saved ? 'checkmark' : 'download'} />
                         Save
                     </Button>
                 </Segment>
