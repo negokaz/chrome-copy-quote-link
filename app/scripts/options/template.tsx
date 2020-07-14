@@ -96,18 +96,32 @@ export const Template = forwardRef<TemplateRef, TemplateProps>((props, ref) => {
                     <Popup
                         on='focus'
                         content={
-                            <dl>
-                                <dt>{'{{title}}'}</dt>
-                                <dd>page title</dd>
-                                <dt>{'{{url}}'}</dt>
-                                <dd>page URL</dd>
-                                <dt>{'{{url_to_text}}'}</dt>
-                                <dd>page URL with Scroll To Text Fragment</dd>
-                                <dt>{'{{text}}'}</dt>
-                                <dd>selected text</dd>
-                                <dt>{'{{#texts}} {{.}} {{/texts}}'}</dt>
-                                <dd>selected text separated by lines</dd>
-                            </dl>
+                            state.enableContexts.includes('selection')
+                            ? (
+                                <dl>
+                                    <dt>{'{{title}}'}</dt>
+                                    <dd>page title</dd>
+                                    <dt>{'{{url}}'}</dt>
+                                    <dd>page URL</dd>
+                                    <dt>{'{{url_to_text}}'}</dt>
+                                    <dd>page URL with Scroll To Text Fragment</dd>
+                                    <dt>{'{{text}}'}</dt>
+                                    <dd>selected text</dd>
+                                    <dt>{'{{#texts}} {{.}} {{/texts}}'}</dt>
+                                    <dd>selected text separated by lines</dd>
+                                </dl>
+                            )
+                            :
+                            state.enableContexts.includes('page')
+                            ? (
+                                <dl>
+                                    <dt>{'{{title}}'}</dt>
+                                    <dd>page title</dd>
+                                    <dt>{'{{url}}'}</dt>
+                                    <dd>page URL</dd>
+                                </dl>
+                            )
+                            : <span>Please select "page" or "selection"</span>
                         }
                         wide={true}
                         trigger={
