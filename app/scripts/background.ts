@@ -89,8 +89,9 @@ async function writeToClipboard(text: string) {
     document.body.appendChild(element);
     element.innerText = text;
     element.addEventListener('copy', function (e) {
-      e.clipboardData.setData('text/plain', text);
-      e.preventDefault();
+        e.clipboardData.setData('text/plain', text);
+        e.clipboardData.setData('text/html', text);
+        e.preventDefault();
     });
     element.focus();
     document.execCommand('SelectAll');
