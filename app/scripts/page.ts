@@ -18,7 +18,7 @@ function handleMessage(message: Copy, sender: Runtime.MessageSender) {
             const pageSelection = PageSelection.create(selection);
             const scrollToTextUrl =
                 url.substr(0, url.length - document.location.hash.length) + pageSelection.generateTextFragment();
-            browser.runtime.sendMessage(sender.id, new Copied(message.templateId, title, url, scrollToTextUrl, selection.toString().trim()));
+            browser.runtime.sendMessage(sender.id, new Copied(message.templateId, title, url, scrollToTextUrl, selection.toString()));
         }
     } catch (e) {
         console.error(e);
