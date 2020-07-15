@@ -1,4 +1,4 @@
-# Custom Template Examples
+# 📝 Custom Template Examples
 
 ## Slack
 
