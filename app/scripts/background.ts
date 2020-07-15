@@ -3,7 +3,9 @@ import { Template } from "./template";
 import { Message, Copied, Copy, OptionSaved } from "./messages";
 import OptionTable from './optionTable';
 
-createContextMenus();
+browser.windows.onCreated.addListener(async _ => {
+    await createContextMenus();
+});
 
 browser.runtime.onInstalled.addListener(async (details) => {
     await createContextMenus();
@@ -25,7 +27,7 @@ browser.runtime.onMessage.addListener(async (message: any, sender) => {
         console.debug(`[copied]\n${renderedText}`);
 
     } else if (msg instanceof OptionSaved) {
-        createContextMenus();
+        await createContextMenus();
     }
 });
 
@@ -65,13 +67,12 @@ async function createContextMenus(): Promise<void> {
         }
     });
     const contextMenuRemoved = browser.contextMenus.removeAll();
-
     const parentId = browser.contextMenus.create({
         title: 'Copy link as',
         contexts: ['page', 'selection'],
     });
     await contextMenuRemoved;
-    (await option).templates.forEach((template) => {
+    option.templates.forEach((template) => {
         browser.contextMenus.create({
             parentId: parentId,
             title: template.name,
