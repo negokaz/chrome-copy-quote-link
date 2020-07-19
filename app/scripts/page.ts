@@ -115,13 +115,15 @@ class PageSelection {
         return escapeStringRegexp(text).replace(/[\r\n]/, '\\s+');
     }
 
+    private encoders: [RegExp, string][] = ['-', '#', '&', ','].map(c =>
+        [new RegExp(escapeStringRegexp(c), 'g'), this.encodePercent(c)]
+    );
+
+    // https://wicg.github.io/scroll-to-text-fragment/#fragment-directive-grammar
     private encodeCharString(text: string): string {
-        // https://wicg.github.io/scroll-to-text-fragment/#fragment-directive-grammar
-        return encodeURI(text)
-                .replace('-', this.encodePercent('-'))
-                .replace('#', this.encodePercent('#'))
-                .replace('&', this.encodePercent('&'))
-                .replace(',', this.encodePercent(','));
+        return this.encoders.reduce(
+            (acc, [regexp, encodedChar]) => acc.replace(regexp, encodedChar),
+            encodeURI(text));
     }
 
     private encodePercent(text: string): string {
