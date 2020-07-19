@@ -18,7 +18,8 @@ function handleMessage(message: Copy, sender: Runtime.MessageSender) {
             const pageSelection = PageSelection.create(selection);
             const scrollToTextUrl =
                 url.substr(0, url.length - document.location.hash.length) + pageSelection.generateTextFragment();
-            browser.runtime.sendMessage(sender.id, new Copied(message.templateId, title, url, scrollToTextUrl, selection.toString()));
+            const selectedText = selection.toString().replace(/^([ \t]*\r?\n)*/, '').replace(/([ \t]*\r?\n)*$/, '');
+            browser.runtime.sendMessage(sender.id, new Copied(message.templateId, title, url, scrollToTextUrl, selectedText));
         }
     } catch (e) {
         console.error(e);
