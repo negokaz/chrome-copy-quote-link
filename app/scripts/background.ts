@@ -3,8 +3,10 @@ import { Template } from "./template";
 import { Message, Copied, Copy, OptionSaved } from "./messages";
 import OptionTable from './optionTable';
 
-browser.windows.onCreated.addListener(async _ => {
-    await createContextMenus();
+browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+    if (info.status && info.status === 'complete') {
+        await createContextMenus();
+    }
 });
 
 browser.runtime.onInstalled.addListener(async (details) => {
