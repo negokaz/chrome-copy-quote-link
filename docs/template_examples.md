@@ -1,8 +1,8 @@
 # 📝 Custom Template Examples
 
-## Slack
+## Slack/Teams
 
-### Slack (link)
+### Slack/Teams (link)
 
 for: `page`
 
@@ -10,7 +10,7 @@ for: `page`
 <a href="{{url}}">{{title}}</a>
 ```
 
-### Slack (quote)
+### Slack/Teams (quote)
 
 for: `selection`
 
@@ -23,7 +23,7 @@ for: `selection`
 </blockquote>
 ```
 
-### Slack (link to text)
+### Slack/Teams (link to text)
 
 for: `selection`
 
@@ -34,6 +34,17 @@ for: `selection`
 {{/texts}}
 <a href="{{url_to_text}}">{{title}}</a>
 </blockquote>
+```
+
+### Slack/Teams (code)
+
+for: `selection`
+
+```
+<pre>
+{{text}}
+</pre>
+<p><a href="{{url_to_text}}">{{title}}</a></p>
 ```
 
 ## Markdown
@@ -69,3 +80,14 @@ for: `selection`
 >
 > [{{title}}]({{url_to_text}})
 ```
+
+### Markdown (code)
+
+for: `selection`
+
+<pre>
+```
+{{text}}
+```
+[{{title}}]({{url_to_text}})
+</pre>
