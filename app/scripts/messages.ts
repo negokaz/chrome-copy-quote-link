@@ -4,11 +4,11 @@ export abstract class Message {
 
     static tryDeserialize(obj: any): Message | undefined {
         switch(obj.messageType) {
-            case Copy.name:
+            case Copy.messageType:
                 return Copy.deserialize(obj);
-            case Copied.name:
+            case Copied.messageType:
                 return Copied.deserialize(obj);
-            case OptionSaved.name:
+            case OptionSaved.messageType:
                 return OptionSaved.deserialize(obj);
             default:
                 return undefined;
@@ -21,12 +21,14 @@ export abstract class Message {
 @JsonObject()
 export class Copy implements Message {
 
+    static messageType = 'Copy';
+
     static deserialize(obj: any): Copy {
         return JSON.deserialize(obj, Copy);
     }
 
     @JsonProperty()
-    readonly messageType: string = Copy.name;
+    readonly messageType: string = Copy.messageType;
 
     @JsonProperty()
     readonly templateId: string;
@@ -39,12 +41,14 @@ export class Copy implements Message {
 @JsonObject()
 export class Copied implements Message {
 
+    static messageType = 'Copied';
+
     static deserialize(obj: any): Copied {
         return JSON.deserialize(obj, Copied);
     }
 
     @JsonProperty()
-    readonly messageType: string = Copied.name;
+    readonly messageType: string = Copied.messageType;
 
     @JsonProperty()
     readonly templateId: string;
@@ -73,10 +77,12 @@ export class Copied implements Message {
 @JsonObject()
 export class OptionSaved implements Message {
 
+    static messageType = 'OptionSaved';
+
     static deserialize(obj: any): OptionSaved {
         return JSON.deserialize(obj, OptionSaved);
     }
 
     @JsonProperty()
-    readonly messageType: string = OptionSaved.name;
+    readonly messageType: string = OptionSaved.messageType;
 }
