@@ -8,6 +8,24 @@ A Chrome extension to share page content and the link with any formats
 - 🔦 Supports for creating a link which can highlight selected text ([Scroll To Text Fragment](https://wicg.github.io/scroll-to-text-fragment/))
 - 📝 You can make your own templates to copy
 
+## Usage
+
+### ‣ Copy link via Context Menu
+
+![](docs/images/usage-context-menu.png)
+
+### ‣ Copy link via Shortcut Key
+
+Default shortcut key is follows. 
+
+- **Windows**: `Ctrl`+`Shift`+`X`
+- **Mac**: `Command`+`Shift`+`X`
+- **Linux**: `Ctrl`+`Shift`+`X`
+
+You can change the setting via `chrome://extensions/shortcuts`
+
+![](docs/images/usage-shortcut-key.png)
+
 ## Custom Templates
 
 To custom the context menu, you can create templates from the extension option page.

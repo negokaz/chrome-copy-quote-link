@@ -1,5 +1,5 @@
 import { browser, Runtime } from "webextension-polyfill-ts";
-import { Copied, Copy } from "./messages";
+import { Message, Copied, Copy, FetchPageContext, PageContext } from "./messages";
 import escapeStringRegexp from 'escape-string-regexp';
 
 if (!browser.runtime.onMessage.hasListeners()) {
@@ -7,22 +7,33 @@ if (!browser.runtime.onMessage.hasListeners()) {
     browser.runtime.onMessage.addListener(handleMessage);
 }
 
-function handleMessage(message: Copy, sender: Runtime.MessageSender) {
-    const title = document.title;
-    const url = document.location.toString();
-    try {
-        const selection = document.getSelection();
-        if (selection.toString() === '') {
-            browser.runtime.sendMessage(sender.id, new Copied(message.templateId, title, url, '', ''));
-        } else {
-            const pageSelection = PageSelection.create(selection);
-            const scrollToTextUrl =
-                url.substr(0, url.length - document.location.hash.length) + pageSelection.generateTextFragment();
-            const selectedText = selection.toString().replace(/^([ \t]*\r?\n)*/, '').replace(/([ \t]*\r?\n)*$/, '');
-            browser.runtime.sendMessage(sender.id, new Copied(message.templateId, title, url, scrollToTextUrl, selectedText));
+async function handleMessage(message: any, sender: Runtime.MessageSender): Promise<any> {
+    const msg = Message.tryDeserialize(message);
+
+    if (msg instanceof Copy) {
+        const title = document.title;
+        const url = document.location.toString();
+        try {
+            const selection = document.getSelection();
+            let copiedResult: Copied
+            if (selection.toString() === '') {
+                copiedResult = new Copied(msg.templateId, title, url, '', '');
+            } else {
+                const pageSelection = PageSelection.create(selection);
+                const scrollToTextUrl =
+                    url.substr(0, url.length - document.location.hash.length) + pageSelection.generateTextFragment();
+                const selectedText = selection.toString().replace(/^([ \t]*\r?\n)*/, '').replace(/([ \t]*\r?\n)*$/, '');
+                copiedResult = new Copied(msg.templateId, title, url, scrollToTextUrl, selectedText);
+            }
+            await browser.runtime.sendMessage(browser.runtime.id, copiedResult);
+            return Promise.resolve(copiedResult);
+        } catch (e) {
+            console.error(e);
+            return Promise.reject(e);
         }
-    } catch (e) {
-        console.error(e);
+    } else if (msg instanceof FetchPageContext) {
+        const selection = document.getSelection();
+        return Promise.resolve(new PageContext(selection.toString() === '' ? 'page' : 'selection'));
     }
 }
 

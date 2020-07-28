@@ -1,6 +1,6 @@
 import { browser } from "webextension-polyfill-ts";
 import { Template } from "./template";
-import { Message, Copied, Copy, OptionSaved } from "./messages";
+import { Message, Copied, Copy, OptionSaved, FetchPageContext } from "./messages";
 import OptionTable from './optionTable';
 
 browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
@@ -21,15 +21,27 @@ browser.runtime.onInstalled.addListener(async (details) => {
 browser.runtime.onMessage.addListener(async (message: any, sender) => {
     const msg = Message.tryDeserialize(message);
 
-    if (msg instanceof Copied) {
-        const copied = Copied.deserialize(message);
+    if (msg instanceof Copy) {
+        const tabs = await browser.tabs.query({active: true, currentWindow: true});
+        const tab = tabs[0];
+        await executePageScript(tab.id);
+        await browser.tabs.sendMessage(tab.id, msg);
+
+    } else if (msg instanceof Copied) {
         const templates = await fetchOption().then(o => o.templates);
-        const renderedText = templates.find(t => t.id === copied.templateId).render(copied);
+        const renderedText = templates.find(t => t.id === msg.templateId).render(msg);
         await writeToClipboard(renderedText);
         console.debug(`[copied]\n${renderedText}`);
 
     } else if (msg instanceof OptionSaved) {
         await createContextMenus();
+
+    } else if (msg instanceof FetchPageContext) {
+        const tabs = await browser.tabs.query({active: true, currentWindow: true});
+        const tab = tabs[0];
+        await executePageScript(tab.id);
+        const pageContext = await browser.tabs.sendMessage(tab.id, msg);
+        return pageContext;
     }
 });
 

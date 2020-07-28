@@ -1,4 +1,5 @@
 import { JSON, JsonObject, JsonProperty, JsonElementType } from "ta-json";
+import { Menus } from "webextension-polyfill-ts";
 
 export abstract class Message {
 
@@ -10,6 +11,10 @@ export abstract class Message {
                 return Copied.deserialize(obj);
             case OptionSaved.messageType:
                 return OptionSaved.deserialize(obj);
+            case FetchPageContext.messageType:
+                return FetchPageContext.deserialize(obj);
+            case PageContext.messageType:
+                return PageContext.deserialize(obj);
             default:
                 return undefined;
         }
@@ -85,4 +90,38 @@ export class OptionSaved implements Message {
 
     @JsonProperty()
     readonly messageType: string = OptionSaved.messageType;
+}
+
+
+@JsonObject()
+export class FetchPageContext implements Message {
+
+    static messageType = 'FetchPageContext';
+
+    static deserialize(obj: any): FetchPageContext {
+        return JSON.deserialize(obj, FetchPageContext);
+    }
+
+    @JsonProperty()
+    readonly messageType: string = FetchPageContext.messageType;
+}
+
+@JsonObject()
+export class PageContext implements Message {
+
+    static messageType = 'PageContext';
+
+    static deserialize(obj: any): PageContext {
+        return JSON.deserialize(obj, PageContext);
+    }
+
+    @JsonProperty()
+    readonly messageType: string = PageContext.messageType;
+
+    @JsonProperty()
+    readonly contextType: Menus.ContextType
+
+    constructor(contextType: Menus.ContextType) {
+        this.contextType = contextType;
+    }
 }

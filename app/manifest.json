@@ -19,5 +19,17 @@
         "scripts/background.js"
       ]
     },
-    "options_page": "options.html"
+    "options_page": "options.html",
+    "browser_action": {
+        "default_title": "Copy Quote Link",
+        "default_popup": "popup.html"
+    },
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+X",
+                "mac": "Command+Shift+X"
+            }
+        }
+    }
   }
