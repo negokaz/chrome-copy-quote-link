@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Dropdown, Transition, Segment, Icon } from 'semantic-ui-react'
+import { Dropdown, Transition, Segment, Icon, DropdownProps } from 'semantic-ui-react'
 import { browser } from "webextension-polyfill-ts";
 import OptionTable from '../optionTable';
 import fuzzysort from 'fuzzysort';
@@ -33,7 +33,15 @@ export const Popup: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            dropdownRef.current.ref.current.querySelector('input').focus();
+            const searchQueryInputElement: HTMLElement = dropdownRef.current.ref.current.querySelector('input');
+            searchQueryInputElement.focus();
+            searchQueryInputElement.addEventListener('keydown', event => {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    window.close();
+                }
+            });
             const response: Promise<PageContext> = browser.runtime.sendMessage(browser.runtime.id, new FetchPageContext());
             const option = storage.get('option').then(d => OptionTable.deserialize(d.option));
             const contextType = (await response).contextType;
