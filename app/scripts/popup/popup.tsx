@@ -34,7 +34,6 @@ export const Popup: React.FC = () => {
     useEffect(() => {
         (async () => {
             dropdownRef.current.ref.current.querySelector('input').focus();
-            console.log(browser.runtime)
             const response: Promise<PageContext> = browser.runtime.sendMessage(browser.runtime.id, new FetchPageContext());
             const option = storage.get('option').then(d => OptionTable.deserialize(d.option));
             const contextType = (await response).contextType;
@@ -43,7 +42,6 @@ export const Popup: React.FC = () => {
                 templates
                     .filter(v => v.enableContexts.includes(contextType))
                     .map((v, i) => {
-                        console.log(v);
                         return { key: v.id, text: v.name, value: v.id, content: (<span>{v.name}</span>) };
                     })
             );
