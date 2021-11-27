@@ -31,7 +31,7 @@
     "webextension-polyfill": "^0.6.0"
   },
   "scripts": {
-    "preinstall": "typesync || :",
+    "postinstall": "typesync",
     "start": "webextension-toolbox dev chrome",
     "package": "webextension-toolbox build chrome"
   }
