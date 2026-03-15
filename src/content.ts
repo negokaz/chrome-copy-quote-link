@@ -1,13 +1,14 @@
-import { browser, Runtime } from "webextension-polyfill-ts";
-import { Message, Copied, Copy, FetchPageContext, PageContext } from "./messages";
+import { Message, Copied, Copy, FetchPageContext, PageContext, WriteToClipboard } from "./lib/messages";
 import escapeStringRegexp from 'escape-string-regexp';
 
-if (!browser.runtime.onMessage.hasListeners()) {
-    console.log('quote-copy-link activated');
-    browser.runtime.onMessage.addListener(handleMessage);
-}
+export default defineContentScript({
+    matches: ['<all_urls>'],
+    main() {
+        browser.runtime.onMessage.addListener(handleMessage);
+    }
+});
 
-async function handleMessage(message: any, sender: Runtime.MessageSender): Promise<any> {
+async function handleMessage(message: any, sender: Browser.runtime.MessageSender): Promise<any> {
     const msg = Message.tryDeserialize(message);
 
     if (msg instanceof Copy) {
@@ -15,25 +16,42 @@ async function handleMessage(message: any, sender: Runtime.MessageSender): Promi
         const url = document.location.toString();
         try {
             const selection = document.getSelection();
-            let copiedResult: Copied
-            if (selection.toString() === '') {
+            const selectedText = selection?.toString() ?? '';
+            let copiedResult: Copied;
+            if (selectedText === '') {
                 copiedResult = new Copied(msg.templateId, title, url, '', '');
             } else {
+                if (!selection) {
+                    throw new Error('Selection is not available');
+                }
+
                 const pageSelection = PageSelection.create(selection);
                 const scrollToTextUrl =
                     url.substr(0, url.length - document.location.hash.length) + pageSelection.generateTextFragment();
-                const selectedText = selection.toString().replace(/^([ \t]*\r?\n)*/, '').replace(/([ \t]*\r?\n)*$/, '');
-                copiedResult = new Copied(msg.templateId, title, url, scrollToTextUrl, selectedText);
+                const normalizedSelectedText = selectedText.replace(/^([ \t]*\r?\n)*/, '').replace(/([ \t]*\r?\n)*$/, '');
+                copiedResult = new Copied(msg.templateId, title, url, scrollToTextUrl, normalizedSelectedText);
             }
-            await browser.runtime.sendMessage(browser.runtime.id, copiedResult);
-            return Promise.resolve(copiedResult);
+            await browser.runtime.sendMessage(copiedResult);
         } catch (e) {
             console.error(e);
             return Promise.reject(e);
         }
     } else if (msg instanceof FetchPageContext) {
         const selection = document.getSelection();
-        return Promise.resolve(new PageContext(selection.toString() === '' ? 'page' : 'selection'));
+        const context = new PageContext((selection?.toString() ?? '') === '' ? 'page' : 'selection');
+        return Promise.resolve(context);
+    } else if (msg instanceof WriteToClipboard) {
+        await writeToClipboard(msg.text);
+        return Promise.resolve();
+    }
+}
+
+async function writeToClipboard(text: string): Promise<void> {
+    if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return;
+    } else {
+        throw new Error('Failed to write text to clipboard');
     }
 }
 
@@ -126,7 +144,7 @@ class PageSelection {
         return escapeStringRegexp(text).replace(/[\r\n]/, '\\s+');
     }
 
-    private encoders: [RegExp, string][] = ['-', '#', '&', ','].map(c =>
+    private encoders: [RegExp, string][] = ['-', '#', '&', ',', '(', ')', '[', ']', '{', '}', '<', '>', '\'', '"', '`'].map(c =>
         [new RegExp(escapeStringRegexp(c), 'g'), this.encodePercent(c)]
     );
 
@@ -141,7 +159,11 @@ class PageSelection {
         let encoded = '';
         const length = text.length;
         for (let i = 0; i < length; i++) {
-            encoded = encoded + '%' + text.codePointAt(i).toString(16)
+            const codePoint = text.codePointAt(i);
+            if (codePoint === undefined) {
+                continue;
+            }
+            encoded = encoded + '%' + codePoint.toString(16);
         }
         return encoded;
     }
@@ -181,7 +203,12 @@ class SingleSelection {
             const endOffset = range.endOffset;
             this.selection.collapseToStart();
             this.selection.modify('extend', direction, granularity);
-            this.selection.setBaseAndExtent(this.selection.focusNode, this.selection.focusOffset, endContainer, endOffset);
+            if (this.selection.focusNode) {
+                this.selection.setBaseAndExtent(this.selection.focusNode, this.selection.focusOffset, endContainer, endOffset);
+            } else {
+                this.setRange(range);
+                throw new Error('Failed to extend selection backward because focusNode is not available');
+            }
         }
     }
 
@@ -225,7 +252,7 @@ class TextFragmentRange {
     }
 
     extend(direction: Direction, granularity: Granularity): TextFragmentRange {
-        const selectionRange = this.selection.getRange()
+        const selectionRange = this.selection.getRange();
         try {
             this.selection.setRange(this.range);
             this.selection.extend(direction, granularity);
@@ -272,9 +299,9 @@ class TextFragmentRange {
         return this.rangeText;
     }
 
-    private findAncestorBlockElement(node: Node): Element {
+    private findAncestorBlockElement(node: Node): Element | null {
         let element = node.parentElement;
-        while (window.getComputedStyle(element).display === 'inline') {
+        while (element && window.getComputedStyle(element).display === 'inline') {
             element = element.parentElement;
         }
         return element;

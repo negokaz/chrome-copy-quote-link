@@ -2,10 +2,9 @@ import React, { useState, useMemo, forwardRef, useImperativeHandle, useCallback,
 
 import { Input, Form, Radio, Button, Icon, Card, Transition, Popup } from 'semantic-ui-react'
 
-import { Template as TemplateState } from '../template';
+import { Template as TemplateState, ContextType } from '../lib/template';
 
 import './template.css';
-import { Menus } from 'webextension-polyfill-ts';
 
 export interface TemplateProps {
     state: TemplateState
@@ -24,7 +23,7 @@ export const Template = forwardRef<TemplateRef, TemplateProps>((props, ref) => {
     const [state, setState] = useState(props.state);
     const [showRemove, setShowRemove] = useState(false);
     const [templateWasChanged, setTemplateWasChanged] = useState(false);
-    const [templateError, setTemplateError] = useState<string>(null);
+    const [templateError, setTemplateError] = useState<string | null>(null);
 
     useImperativeHandle(ref, () => ({
         template() {
@@ -35,7 +34,7 @@ export const Template = forwardRef<TemplateRef, TemplateProps>((props, ref) => {
     const nameInputRef = useRef<Input>(null);
 
     useEffect(() => {
-        if (props.isNew) {
+        if (props.isNew && nameInputRef.current) {
             nameInputRef.current.focus();
         }
     }, []);
@@ -45,7 +44,7 @@ export const Template = forwardRef<TemplateRef, TemplateProps>((props, ref) => {
     const remove = useCallback(() => props.onRemove(state), []);
 
     const handleNameChange  = useCallback((e, { value }) => setState(current => current.withName(value)), []);
-    const handleScopeChange = useCallback((e, { value }) => setState(current => current.withEnableContexts(value)), []);
+    const handleScopeChange = useCallback((e, { value }) => setState(current => current.withEnableContexts(value as ContextType)), []);
 
     const tryUpdateTemplate = (currentState: TemplateState, template: string) => {
         setTemplateWasChanged(true);

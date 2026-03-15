@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect, RefObject, useCallback } from 'react';
 import { Template, TemplateRef } from './template';
-import { Template as TemplateState } from '../template'
-import { browser } from "webextension-polyfill-ts";
-import { Icon, Form, Button, Card, Segment, Transition } from 'semantic-ui-react'
-import { OptionSaved } from '../messages';
-import OptionTable from '../optionTable';
+import { Template as TemplateState } from '../lib/template'
+import { Icon, Form, Button, Card, Segment } from 'semantic-ui-react'
+import { OptionSaved } from '../lib/messages';
+import OptionTable from '../lib/optionTable';
 
 import './options.css'
 
@@ -46,10 +45,15 @@ export default function Options() {
     const save = useCallback(async () => {
         const templates =
             Array.from(templateRef.current.values())
-                .map(t => t.current.template())
+                .reduce<TemplateState[]>((acc, ref) => {
+                    if (ref.current) {
+                        acc.push(ref.current.template());
+                    }
+                    return acc;
+                }, [])
                 .filter(t => t.name.trim() !== '' && t.enableContexts.length !== 0);
         await storage.set({'option': new OptionTable(templates)});
-        await browser.runtime.sendMessage(browser.runtime.id, new OptionSaved());
+        await browser.runtime.sendMessage(new OptionSaved());
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
     }, []);

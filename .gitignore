@@ -4,3 +4,7 @@ packages/
 *.log
 
 .DS_Store
+
+# WXT
+.output/
+.wxt/

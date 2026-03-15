@@ -1,16 +1,15 @@
 import { Copied } from "./messages";
 import Mustache from 'mustache';
-import { Menus } from "webextension-polyfill-ts";
 import { v4 as uuidv4 } from 'uuid';
-import { JsonObject, JsonProperty, JSON, JsonElementType } from "ta-json";
 
 // disable HTML escaping
 Mustache.escape = (v) => v;
 
-@JsonObject()
+export type ContextType = 'page' | 'selection';
+
 export class Template {
 
-    static create(name: string, template: string, enableContexts: Array<Menus.ContextType>): Template {
+    static create(name: string, template: string, enableContexts: Array<ContextType>): Template {
         return new Template(uuidv4(), name, template, enableContexts);
     }
 
@@ -18,20 +17,19 @@ export class Template {
         return new Template(uuidv4(), '', '', []);
     }
 
-    @JsonProperty()
+    static deserialize(obj: any): Template {
+        return new Template(obj.id, obj.name, obj.template, obj.enableContexts ?? []);
+    }
+
     readonly id: string;
 
-    @JsonProperty()
     readonly name: string;
 
-    @JsonProperty()
     readonly template: string;
 
-    @JsonProperty()
-    @JsonElementType(String)
-    readonly enableContexts: Array<Menus.ContextType>;
+    readonly enableContexts: Array<ContextType>;
 
-    private constructor(id: string, name: string, template: string, enableContexts: Array<Menus.ContextType>) {
+    public constructor(id: string, name: string, template: string, enableContexts: Array<ContextType>) {
         this.id = id;
         this.name = name;
         this.template = template;
@@ -42,7 +40,9 @@ export class Template {
         try {
             Mustache.parse(this.template);
         } catch (e) {
-            return e;
+            if (e instanceof Error) {
+                return e;
+            }
         }
         return null;
     }
@@ -59,7 +59,7 @@ export class Template {
         return new Template(this.id, this.name, template, this.enableContexts);
     }
 
-    withEnableContexts(scope: Menus.ContextType) {
+    withEnableContexts(scope: ContextType) {
         return new Template(this.id, this.name, this.template, [scope]);
     }
 }

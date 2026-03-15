@@ -1,11 +1,6 @@
 {
-    "compilerOptions": {
-        "sourceMap": true,
-        "target": "es6",
-        "module": "commonjs",
-        "jsx": "react",
-        "esModuleInterop": true,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
-    }
+  "extends": "./.wxt/tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react"
+  }
 }

@@ -1,5 +1,4 @@
-import { JSON, JsonObject, JsonProperty, JsonElementType } from "ta-json";
-import { Menus } from "webextension-polyfill-ts";
+export type ContextType = 'page' | 'selection';
 
 export abstract class Message {
 
@@ -9,6 +8,8 @@ export abstract class Message {
                 return Copy.deserialize(obj);
             case Copied.messageType:
                 return Copied.deserialize(obj);
+            case WriteToClipboard.messageType:
+                return WriteToClipboard.deserialize(obj);
             case OptionSaved.messageType:
                 return OptionSaved.deserialize(obj);
             case FetchPageContext.messageType:
@@ -20,22 +21,19 @@ export abstract class Message {
         }
     }
 
-    readonly messageType: string
+    readonly messageType!: string;
 }
 
-@JsonObject()
 export class Copy implements Message {
 
     static messageType = 'Copy';
 
     static deserialize(obj: any): Copy {
-        return JSON.deserialize(obj, Copy);
+        return new Copy(obj.templateId);
     }
 
-    @JsonProperty()
     readonly messageType: string = Copy.messageType;
 
-    @JsonProperty()
     readonly templateId: string;
 
     constructor(templateId: string) {
@@ -43,31 +41,24 @@ export class Copy implements Message {
     }
 }
 
-@JsonObject()
 export class Copied implements Message {
 
     static messageType = 'Copied';
 
     static deserialize(obj: any): Copied {
-        return JSON.deserialize(obj, Copied);
+        return new Copied(obj.templateId, obj.title, obj.url, obj.urlWithTextFragment, obj.selectedText);
     }
 
-    @JsonProperty()
     readonly messageType: string = Copied.messageType;
 
-    @JsonProperty()
     readonly templateId: string;
 
-    @JsonProperty()
     readonly title: string;
 
-    @JsonProperty()
     readonly url: string;
 
-    @JsonProperty()
     readonly urlWithTextFragment: string;
 
-    @JsonProperty()
     readonly selectedText: string;
 
     constructor(templateId: string, title: string, url: string, urlWithTextFragment: string, selectedText: string) {
@@ -79,49 +70,58 @@ export class Copied implements Message {
     }
 }
 
-@JsonObject()
+export class WriteToClipboard implements Message {
+
+    static messageType = 'WriteToClipboard';
+
+    static deserialize(obj: any): WriteToClipboard {
+        return new WriteToClipboard(obj.text);
+    }
+
+    readonly messageType: string = WriteToClipboard.messageType;
+
+    readonly text: string;
+
+    constructor(text: string) {
+        this.text = text;
+    }
+}
+
 export class OptionSaved implements Message {
 
     static messageType = 'OptionSaved';
 
     static deserialize(obj: any): OptionSaved {
-        return JSON.deserialize(obj, OptionSaved);
+        return new OptionSaved();
     }
 
-    @JsonProperty()
     readonly messageType: string = OptionSaved.messageType;
 }
 
-
-@JsonObject()
 export class FetchPageContext implements Message {
 
     static messageType = 'FetchPageContext';
 
     static deserialize(obj: any): FetchPageContext {
-        return JSON.deserialize(obj, FetchPageContext);
+        return new FetchPageContext();
     }
 
-    @JsonProperty()
     readonly messageType: string = FetchPageContext.messageType;
 }
 
-@JsonObject()
 export class PageContext implements Message {
 
     static messageType = 'PageContext';
 
     static deserialize(obj: any): PageContext {
-        return JSON.deserialize(obj, PageContext);
+        return new PageContext(obj.contextType);
     }
 
-    @JsonProperty()
     readonly messageType: string = PageContext.messageType;
 
-    @JsonProperty()
-    readonly contextType: Menus.ContextType
+    readonly contextType: ContextType;
 
-    constructor(contextType: Menus.ContextType) {
+    constructor(contextType: ContextType) {
         this.contextType = contextType;
     }
 }
